@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Constructions règle et compas</title>
+<style>
+:root{--bg:#0e1a44;--panel:#fbfaf4;--ink:#171717;--teal:#0f5b55;--garnet:#8a1d2c;--blue:#1d4f91;--gold:#c79b2b;--line:#d8d2c4}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f3f1ea;color:var(--ink)}
+header{background:var(--bg);color:white;padding:18px 24px;border-bottom:5px solid var(--gold)}
+header h1{margin:0;font-size:1.55rem;font-weight:650}header p{margin:.35rem 0 0;opacity:.9}
+main{padding:20px;max-width:1180px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 2px 10px #0001}
+.panel h2{margin:.1rem 0 1rem;font-size:1.1rem;color:var(--teal)}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:12px}
+.control{display:flex;flex-direction:column;gap:4px}
+label{font-weight:600;font-size:.92rem}
+input,select,button{font:inherit;border:1px solid #bbb;border-radius:8px;padding:7px 9px;background:white}
+button{background:var(--teal);color:white;border-color:var(--teal);cursor:pointer}
+button.secondary{background:white;color:var(--teal)}
+.note{font-size:.92rem;color:#444;line-height:1.45}
+.pill{display:inline-block;border-radius:999px;background:#e8e3d7;padding:3px 9px;margin:3px;font-size:.88rem}
+.pill.good{background:#d8f1e1;color:var(--teal)}
+.pill.bad{background:#f4d5d5;color:var(--garnet)}
+.result{font-size:1.05rem;line-height:1.5}
+.success{border-left:4px solid var(--teal);padding:10px 12px;background:#f5fffb;font-size:1.05rem}
+.warn{border-left:4px solid var(--garnet);padding:10px 12px;background:#fff7f7;font-size:1.05rem}
+.info{border-left:4px solid var(--blue);padding:8px 10px;background:#f5f9ff;margin-top:8px}
+.small{font-size:.88rem;color:#555}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.linkbar{margin-top:12px;font-size:.9rem;color:#555}
+.bigbtns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.bigbtns button{font-size:.95rem;padding:6px 12px}
+svg{max-width:100%;height:auto;display:block;margin:0 auto}
+table{border-collapse:collapse;margin:8px 0;background:white;font-size:.9rem}
+td,th{border:1px solid #aaa;padding:5px 9px;text-align:center}
+th{background:#eee}
+</style>
+</head><body>
+<header><h1>Constructions à la règle et au compas</h1><p>Polygones réguliers constructibles selon le critère de Gauss-Wantzel.</p></header>
+<main>
+<section class="panel">
+  <div class="controls">
+    <div class="control"><label for="n">Nombre de côtés n</label>
+      <input id="n" type="number" min="3" max="1000000" value="17">
+    </div>
+    <button id="go">Tester</button>
+  </div>
+  <div class="bigbtns">
+    <button class="secondary" onclick="setN(3)">3</button>
+    <button class="secondary" onclick="setN(5)">5</button>
+    <button class="secondary" onclick="setN(7)">7</button>
+    <button class="secondary" onclick="setN(15)">15</button>
+    <button class="secondary" onclick="setN(17)">17 (Gauss)</button>
+    <button class="secondary" onclick="setN(257)">257</button>
+    <button class="secondary" onclick="setN(60)">60</button>
+    <button class="secondary" onclick="setN(9)">9</button>
+    <button class="secondary" onclick="setN(11)">11</button>
+  </div>
+  <div id="result"></div>
+</section>
+<section class="grid">
+  <div class="panel">
+    <h2>Visualisation</h2>
+    <svg id="polygon" viewBox="0 0 400 400"></svg>
+    <p class="note" id="polyDesc"></p>
+  </div>
+  <div class="panel">
+    <h2>Analyse arithmétique</h2>
+    <div id="analysis"></div>
+    <div id="phi" class="info"></div>
+  </div>
+  <div class="panel">
+    <h2>Critère de Gauss-Wantzel</h2>
+    <p class="note">Le polygone régulier à <b>n</b> côtés est constructible à la règle et au compas si et seulement si</p>
+    <p class="note" style="text-align:center"><b>n = 2<sup>k</sup> · p<sub>1</sub> · p<sub>2</sub> ··· p<sub>r</sub></b></p>
+    <p class="note">où les p<sub>i</sub> sont des premiers de Fermat distincts. De manière équivalente, φ(n) doit être une puissance de 2.</p>
+    <h3 style="margin:1rem 0 .5rem;color:var(--blue);font-size:.95rem">Premiers de Fermat connus</h3>
+    <table>
+      <tr><th>F<sub>k</sub></th><th>2<sup>2<sup>k</sup></sup>+1</th><th>premier ?</th></tr>
+      <tr><td>F<sub>0</sub></td><td>3</td><td class="mono">oui</td></tr>
+      <tr><td>F<sub>1</sub></td><td>5</td><td class="mono">oui</td></tr>
+      <tr><td>F<sub>2</sub></td><td>17</td><td class="mono">oui</td></tr>
+      <tr><td>F<sub>3</sub></td><td>257</td><td class="mono">oui</td></tr>
+      <tr><td>F<sub>4</sub></td><td>65 537</td><td class="mono">oui</td></tr>
+      <tr><td>F<sub>5</sub></td><td>4 294 967 297</td><td class="mono">non, = 641 × 6 700 417</td></tr>
+    </table>
+    <p class="small">Aucun autre premier de Fermat n'est connu à ce jour.</p>
+  </div>
+</section>
+<div class="linkbar">Applet statique HTML/JS pur. Déployable tel quel sur GitHub Pages.</div>
+</main>
+<script>
+const FERMAT=[3,5,17,257,65537];
+const $=id=>document.getElementById(id);
+function factor(n){let r=[];for(let p=2;p*p<=n;p++){let e=0;while(n%p===0){n=Math.floor(n/p);e++}if(e)r.push([p,e])}if(n>1)r.push([n,1]);return r}
+function phi(n){let r=n;for(let [p,e] of factor(n))r=r/p*(p-1);return r}
+function isPow2(n){return n>0&&(n&(n-1))===0}
+function setN(v){$('n').value=v;render()}
+
+function drawPoly(n,ok){
+  let svg=$('polygon');
+  let cx=200,cy=200,R=160;
+  let out='';
+  // cercle de support
+  out+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${ok?'#f0f9f7':'#fff5f5'}" stroke="${ok?'#0f5b55':'#8a1d2c'}" stroke-width="1" stroke-dasharray="3,3"/>`;
+  // points
+  let pts=[];
+  for(let k=0;k<n;k++){
+    let a=-Math.PI/2+2*Math.PI*k/n;
+    pts.push([cx+R*Math.cos(a),cy+R*Math.sin(a)]);
+  }
+  // Si n est grand (>30), pas de marqueurs ronds
+  let drawCorners=n<=30;
+  // segments du polygone
+  if(n<=80){
+    let path='M '+pts.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L ')+' Z';
+    out+=`<path d="${path}" fill="${ok?'#d8f1e1':'#f4d5d5'}" fill-opacity="0.5" stroke="${ok?'#0f5b55':'#8a1d2c'}" stroke-width="${n>20?1:2}"/>`;
+  }else{
+    // pour gros n, juste un anneau
+    out+=`<circle cx="${cx}" cy="${cy}" r="${R-2}" fill="none" stroke="${ok?'#0f5b55':'#8a1d2c'}" stroke-width="2"/>`;
+    out+=`<text x="${cx}" y="${cy}" text-anchor="middle" font-size="14" fill="#666">${n} côtés (trop nombreux pour dessin)</text>`;
+  }
+  // sommets
+  if(drawCorners){
+    for(let p of pts)out+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${ok?'#0f5b55':'#8a1d2c'}"/>`;
+  }
+  svg.innerHTML=out;
+}
+
+function render(){
+  let n=Math.max(3,Math.floor(+$('n').value||3));
+  let fac=factor(n);
+  let ok=true,parts=[];
+  let fermatUsed=[];
+  let obstructions=[];
+  for(let [p,e] of fac){
+    let label=e===1?String(p):`${p}<sup>${e}</sup>`;
+    parts.push(label);
+    if(p===2){
+      // toujours autorisé
+    }else if(FERMAT.includes(p)&&e===1){
+      fermatUsed.push(p);
+    }else{
+      ok=false;
+      obstructions.push(p===2?null:(e>1?`exposant ${e} sur ${p}`:`${p} n'est pas premier de Fermat`));
+    }
+  }
+  $('result').innerHTML=ok?
+    `<div class="success">Le polygone à <b>${n}</b> côtés est <b>constructible</b> à la règle et au compas.</div>`:
+    `<div class="warn">Le polygone à <b>${n}</b> côtés <b>n'est pas constructible</b> selon le critère de Gauss-Wantzel.</div>`;
+
+  // Analyse
+  let html='<p>Décomposition en facteurs premiers :</p>';
+  html+=`<p class="mono" style="font-size:1.05rem;text-align:center;margin:8px 0"><b>${n} = ${parts.join(' × ')}</b></p>`;
+  html+='<p>Examen de chaque facteur :</p>';
+  for(let [p,e] of fac){
+    if(p===2){
+      html+=`<span class="pill good">2<sup>${e}</sup> : puissance de 2 (autorisée)</span>`;
+    }else if(FERMAT.includes(p)&&e===1){
+      html+=`<span class="pill good">${p} : premier de Fermat (autorisé)</span>`;
+    }else{
+      let why=e>1?`${p}<sup>${e}</sup> : exposant > 1 sur un premier impair`:`${p} : pas premier de Fermat`;
+      html+=`<span class="pill bad">${why}</span>`;
+    }
+  }
+  $('analysis').innerHTML=html;
+
+  // Lien avec phi(n)
+  let pn=phi(n);
+  let pow2=isPow2(pn);
+  $('phi').innerHTML=
+    `Indicatrice d'Euler : <b>φ(${n}) = ${pn}</b>. `+
+    (pow2?
+      `${pn} est une puissance de 2 (2<sup>${Math.log2(pn)}</sup>), donc le degré [ℚ(ζ<sub>${n}</sub>):ℚ] est une puissance de 2, et la condition de constructibilité est satisfaite.`:
+      `${pn} n'est pas une puissance de 2, donc le degré [ℚ(ζ<sub>${n}</sub>):ℚ] n'est pas une puissance de 2, et le polygone n'est pas constructible.`);
+
+  $('polyDesc').innerHTML=ok?
+    `Polygone régulier à <b>${n}</b> côtés. Angle au centre : 2π/${n} ≈ ${(360/n).toFixed(3)}°.`:
+    `Le polygone à ${n} côtés existe géométriquement mais ne peut être tracé à la règle et au compas.`;
+  drawPoly(n,ok);
+}
+$('go').onclick=render;
+$('n').addEventListener('input',render);
+render();
+</script>
+</body></html>
