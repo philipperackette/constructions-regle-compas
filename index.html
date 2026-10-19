@@ -92,8 +92,9 @@ th{background:#eee}
 const FERMAT=[3,5,17,257,65537];
 const $=id=>document.getElementById(id);
 function factor(n){let r=[];for(let p=2;p*p<=n;p++){let e=0;while(n%p===0){n=Math.floor(n/p);e++}if(e)r.push([p,e])}if(n>1)r.push([n,1]);return r}
-function phi(n){let r=n;for(let [p,e] of factor(n))r=r/p*(p-1);return r}
+function phi(n){let r=n;for(let [p] of factor(n))r=r/p*(p-1);return r}
 function isPow2(n){return n>0&&(n&(n-1))===0}
+/* exported setN */
 function setN(v){$('n').value=v;render()}
 
 function drawPoly(n,ok){
